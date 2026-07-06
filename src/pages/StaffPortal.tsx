@@ -1,7 +1,21 @@
+import React, { useState } from 'react';
 import { Users, CheckCircle2, Circle, Clock } from 'lucide-react';
 import { motion } from 'motion/react';
+import toast from 'react-hot-toast';
 
 export default function StaffPortal() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmitReport = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success('Incident report submitted to Command Center');
+      (e.target as HTMLFormElement).reset();
+    }, 1000);
+  };
+
   return (
     <div className="flex-1 flex flex-col p-4 md:p-6 overflow-y-auto">
       <div className="mb-8">
@@ -52,10 +66,10 @@ export default function StaffPortal() {
         {/* Quick Report */}
         <div className="glass-panel p-6 rounded-2xl border border-white/5 flex flex-col">
           <h3 className="font-semibold text-lg mb-6">Report Incident</h3>
-          <form className="flex-1 flex flex-col gap-4">
+          <form onSubmit={handleSubmitReport} className="flex-1 flex flex-col gap-4">
             <div>
-              <label className="text-sm font-medium text-slate-400 mb-1 block">Incident Type</label>
-              <select className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/50">
+              <label htmlFor="incident-type" className="text-sm font-medium text-slate-400 mb-1 block">Incident Type</label>
+              <select id="incident-type" required className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50">
                 <option>Medical Issue</option>
                 <option>Security Concern</option>
                 <option>Facility Maintenance</option>
@@ -64,17 +78,21 @@ export default function StaffPortal() {
             </div>
             
             <div>
-              <label className="text-sm font-medium text-slate-400 mb-1 block">Location / Zone</label>
-              <input type="text" placeholder="e.g. Gate C, Level 2" className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/50" />
+              <label htmlFor="incident-location" className="text-sm font-medium text-slate-400 mb-1 block">Location / Zone</label>
+              <input id="incident-location" required type="text" placeholder="e.g. Gate C, Level 2" className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-400 mb-1 block">Description</label>
-              <textarea rows={4} placeholder="Briefly describe the situation..." className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/50 resize-none"></textarea>
+              <label htmlFor="incident-desc" className="text-sm font-medium text-slate-400 mb-1 block">Description</label>
+              <textarea id="incident-desc" required rows={4} placeholder="Briefly describe the situation..." className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 resize-none"></textarea>
             </div>
 
-            <button type="button" className="mt-auto w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors">
-              Submit Report to Command
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="mt-auto w-full py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-800 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit Report to Command'}
             </button>
           </form>
         </div>

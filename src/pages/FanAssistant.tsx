@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Loader2, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
+import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 interface Message {
   id: string;
@@ -10,6 +12,7 @@ interface Message {
 }
 
 export default function FanAssistant() {
+  const { token, isLoading: authLoading } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -31,17 +34,26 @@ export default function FanAssistant() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || authLoading) return;
+
+    if (!token) {
+      toast.error('Authentication required to use the chat.');
+      return;
+    }
 
     const userMessage = input.trim();
     setInput('');
-    setMessages(prev => [...prev, { id: Date.now().toString(), role: 'user', content: userMessage }]);
+    const newUserId = Date.now().toString();
+    setMessages(prev => [...prev, { id: newUserId, role: 'user', content: userMessage }]);
     setIsLoading(true);
 
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ prompt: userMessage })
       });
       
@@ -55,11 +67,11 @@ export default function FanAssistant() {
         content: data.text
       }]);
     } catch (error: any) {
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'I apologize, but I am having trouble connecting to the network right now. Please try again later.'
-      }]);
+      console.error(error);
+      toast.error(error.message || 'Failed to communicate with AI');
+      // Revert the optimistic update on failure to allow retry
+      setInput(userMessage);
+      setMessages(prev => prev.filter(msg => msg.id !== newUserId));
     } finally {
       setIsLoading(false);
     }
@@ -136,9 +148,36 @@ export default function FanAssistant() {
                 <div className="w-8 h-8 rounded-full bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center shrink-0">
                   <Bot className="w-4 h-4" />
                 </div>
-                <div className="p-4 rounded-2xl rounded-tl-none bg-white/5 border border-white/5 flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
-                  <span className="text-slate-400 text-sm">Thinking...</span>
+                <div className="p-4 rounded-2xl rounded-tl-none bg-white/5 border border-white/5 flex flex-col gap-3 min-w-[200px]">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                    <span className="text-slate-400 text-sm font-medium">Thinking...</span>
+                  </div>
+                  
+                  {/* Text Skeleton */}
+                  <div className="space-y-2">
+                    <div className="h-2.5 bg-slate-700/50 rounded overflow-hidden relative w-full">
+                       <motion.div 
+                         className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"
+                         animate={{ x: ['-100%', '100%'] }}
+                         transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                       />
+                    </div>
+                    <div className="h-2.5 bg-slate-700/50 rounded overflow-hidden relative w-[85%]">
+                       <motion.div 
+                         className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"
+                         animate={{ x: ['-100%', '100%'] }}
+                         transition={{ repeat: Infinity, duration: 1.5, ease: "linear", delay: 0.1 }}
+                       />
+                    </div>
+                    <div className="h-2.5 bg-slate-700/50 rounded overflow-hidden relative w-[40%]">
+                       <motion.div 
+                         className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"
+                         animate={{ x: ['-100%', '100%'] }}
+                         transition={{ repeat: Infinity, duration: 1.5, ease: "linear", delay: 0.2 }}
+                       />
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}

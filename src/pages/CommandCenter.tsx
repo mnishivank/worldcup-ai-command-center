@@ -1,7 +1,27 @@
+import { useState } from 'react';
 import { ShieldAlert, AlertTriangle, CheckCircle2, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
+import toast from 'react-hot-toast';
 
 export default function CommandCenter() {
+  const [isExecuting, setIsExecuting] = useState(false);
+
+  const handleExecuteAI = () => {
+    setIsExecuting(true);
+    setTimeout(() => {
+      setIsExecuting(false);
+      toast.success('AI recommendations executed across all subsystems.');
+    }, 1500);
+  };
+
+  const handleAssignTeam = (title: string) => {
+    toast.success(`Team assigned to: ${title}`);
+  };
+
+  const handleViewCamera = (title: string) => {
+    toast('Camera feed not available in demo environment.', { icon: '📹' });
+  };
+
   return (
     <div className="flex-1 flex flex-col p-4 md:p-6 overflow-y-auto bg-red-950/20">
       <div className="mb-8">
@@ -38,8 +58,8 @@ export default function CommandCenter() {
                   <span className="text-xs opacity-70">{incident.time}</span>
                 </div>
                 <div className="flex gap-2 mt-2">
-                  <button className="text-xs bg-black/20 hover:bg-black/40 px-3 py-1 rounded transition-colors">Assign Team</button>
-                  <button className="text-xs bg-black/20 hover:bg-black/40 px-3 py-1 rounded transition-colors">View Camera</button>
+                  <button onClick={() => handleAssignTeam(incident.title)} className="text-xs bg-black/20 hover:bg-black/40 px-3 py-1 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-white">Assign Team</button>
+                  <button onClick={() => handleViewCamera(incident.title)} className="text-xs bg-black/20 hover:bg-black/40 px-3 py-1 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-white">View Camera</button>
                 </div>
               </div>
             </motion.div>
@@ -63,8 +83,12 @@ export default function CommandCenter() {
                   <li>Notify local authorities regarding Gate A package.</li>
                 </ul>
               </div>
-              <button className="w-full py-3 bg-rose-600 hover:bg-rose-500 text-white font-semibold rounded-xl transition-colors mt-auto">
-                Execute AI Recommendations
+              <button 
+                onClick={handleExecuteAI}
+                disabled={isExecuting}
+                className="w-full py-3 bg-rose-600 hover:bg-rose-500 disabled:bg-rose-800 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors mt-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+              >
+                {isExecuting ? 'Transmitting Directives...' : 'Execute AI Recommendations'}
               </button>
             </div>
           </div>
