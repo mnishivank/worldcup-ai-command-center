@@ -3,23 +3,49 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
 
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+// Security Middleware
+app.use(helmet({
+  contentSecurityPolicy: false, // Disabled for dev environment inline scripts/styles
+}));
+app.use(cors());
+app.use(express.json({ limit: '10kb' })); // Limit body size to prevent payload too large DOS
 
-// Initialize Gemini Client
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  httpOptions: {
-    headers: {
-      'User-Agent': 'aistudio-build',
-    }
-  }
+// Rate Limiting
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: { error: 'Too many requests, please try again later.' }
 });
+
+app.use('/api/', apiLimiter);
+
+// Initialize Gemini Client (Lazy initialization check recommended)
+let aiClient: GoogleGenAI | null = null;
+function getAIClient() {
+  if (!aiClient) {
+    if (!process.env.GEMINI_API_KEY) {
+      console.warn("WARNING: GEMINI_API_KEY is not set.");
+    }
+    aiClient = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY || 'dummy_key',
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
+  }
+  return aiClient;
+}
 
 // Mock Analytics Data API
 app.get('/api/analytics/crowd', (req, res) => {
@@ -59,11 +85,21 @@ app.get('/api/analytics/sustainability', (req, res) => {
 app.post('/api/chat', async (req, res) => {
   try {
     const { prompt, context } = req.body;
+
+    // Input Validation
+    if (!prompt || typeof prompt !== 'string' || prompt.length > 1000) {
+      return res.status(400).json({ error: 'Invalid or missing prompt' });
+    }
     
     let systemInstruction = "You are the FIFA World Cup 2026 AI Assistant. Provide helpful, concise answers to fans, staff, and volunteers about stadium operations, schedules, navigation, and general tournament info. Tone should be professional, welcoming, and energetic.";
     
     if (context === 'operations') {
       systemInstruction = "You are the Operations Command Center AI. Provide tactical, concise summaries of stadium situations, crowd control recommendations, and emergency response suggestions based on provided data.";
+    }
+
+    const ai = getAIClient();
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(503).json({ error: 'AI service unavailable: API key missing' });
     }
 
     const response = await ai.models.generateContent({

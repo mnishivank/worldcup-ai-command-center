@@ -70,11 +70,11 @@ export default function LandingPage() {
             Real-time intelligence, seamless navigation, and predictive operations for fans, staff, and organizers.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/command" className="px-8 py-4 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 text-white font-semibold flex items-center gap-2 hover:from-rose-500 hover:to-rose-600 transition-all shadow-lg shadow-rose-900/20 w-full sm:w-auto justify-center">
-              Enter Command Center <ArrowRight className="w-5 h-5" />
+            <Link to="/command" className="px-8 py-4 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 text-white font-semibold flex items-center gap-2 hover:from-rose-500 hover:to-rose-600 transition-all shadow-lg shadow-rose-900/20 w-full sm:w-auto justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">
+              Enter Command Center <ArrowRight className="w-5 h-5" aria-hidden="true" />
             </Link>
-            <Link to="/assistant" className="px-8 py-4 rounded-xl glass-panel text-white font-semibold flex items-center gap-2 hover:bg-white/10 transition-all w-full sm:w-auto justify-center">
-              Try AI Assistant <Bot className="w-5 h-5" />
+            <Link to="/assistant" className="px-8 py-4 rounded-xl glass-panel text-white font-semibold flex items-center gap-2 hover:bg-white/10 transition-all w-full sm:w-auto justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">
+              Try AI Assistant <Bot className="w-5 h-5" aria-hidden="true" />
             </Link>
           </div>
         </motion.div>
@@ -102,11 +102,11 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
             >
-              <Link to={feature.path} className="block h-full group">
+              <Link to={feature.path} className="block h-full group focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-2xl">
                 <div className="glass-panel p-8 rounded-2xl h-full hover:bg-white/[0.08] transition-colors border border-white/5 relative overflow-hidden">
                   <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${feature.color} opacity-50 group-hover:opacity-100 transition-opacity`} />
                   <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6">
-                    <feature.icon className="w-6 h-6 text-slate-200 group-hover:text-white transition-colors" />
+                    <feature.icon className="w-6 h-6 text-slate-200 group-hover:text-white transition-colors" aria-hidden="true" />
                   </div>
                   <h3 className="text-xl font-semibold mb-3 group-hover:text-white transition-colors">{feature.title}</h3>
                   <p className="text-slate-400 text-sm leading-relaxed">{feature.description}</p>

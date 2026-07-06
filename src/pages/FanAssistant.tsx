@@ -91,7 +91,12 @@ export default function FanAssistant() {
       <div className="flex-1 glass-panel rounded-2xl border border-white/10 flex flex-col overflow-hidden relative shadow-2xl">
         
         {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        <div 
+          className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6"
+          role="log"
+          aria-live="polite"
+          aria-atomic="false"
+        >
           <AnimatePresence initial={false}>
             {messages.map((msg) => (
               <motion.div
@@ -144,12 +149,12 @@ export default function FanAssistant() {
         {/* Input Area */}
         <div className="p-4 bg-slate-900/80 border-t border-white/10 backdrop-blur-md">
           {messages.length === 1 && (
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-2 mb-4" aria-label="Suggested questions">
               {SUGGESTIONS.map((suggestion, i) => (
                 <button
                   key={i}
                   onClick={() => setInput(suggestion)}
-                  className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1.5 text-slate-300 transition-colors"
+                  className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1.5 text-slate-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 >
                   {suggestion}
                 </button>
@@ -157,20 +162,25 @@ export default function FanAssistant() {
             </div>
           )}
           <form onSubmit={handleSubmit} className="flex gap-2">
+            <label htmlFor="chat-input" className="sr-only">Type your message</label>
             <input
+              id="chat-input"
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about schedules, facilities, or directions..."
-              className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all"
+              className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus-visible:ring-2 focus-visible:ring-blue-500/50 transition-all"
               disabled={isLoading}
+              aria-disabled={isLoading}
             />
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 text-white rounded-xl px-4 py-3 flex items-center justify-center transition-colors"
+              aria-disabled={!input.trim() || isLoading}
+              aria-label="Send message"
+              className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 text-white rounded-xl px-4 py-3 flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-5 h-5" aria-hidden="true" />
             </button>
           </form>
         </div>

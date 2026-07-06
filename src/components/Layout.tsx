@@ -21,17 +21,17 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col relative">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 glass-panel border-b border-white/5">
+      <nav aria-label="Main Navigation" className="sticky top-0 z-50 glass-panel border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 rounded-lg">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-600 to-rose-900 flex items-center justify-center shrink-0 border border-rose-500/30">
-                <Trophy className="w-5 h-5 text-rose-100" />
+                <Trophy className="w-5 h-5 text-rose-100" aria-hidden="true" />
               </div>
               <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
                 WorldCup AI Command
               </span>
-            </div>
+            </Link>
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center space-x-1">
@@ -41,14 +41,15 @@ export default function Layout({ children }: { children: ReactNode }) {
                   <Link
                     key={item.path}
                     to={item.path}
+                    aria-current={isActive ? 'page' : undefined}
                     className={cn(
-                      "px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2",
+                      "px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500",
                       isActive 
                         ? "bg-white/10 text-white" 
                         : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
                     )}
                   >
-                    <item.icon className="w-4 h-4" />
+                    <item.icon className="w-4 h-4" aria-hidden="true" />
                     <span className="hidden lg:inline">{item.name}</span>
                   </Link>
                 );
@@ -59,9 +60,11 @@ export default function Layout({ children }: { children: ReactNode }) {
             <div className="md:hidden flex items-center">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-slate-400 hover:text-white p-2"
+                aria-expanded={mobileMenuOpen}
+                aria-label="Toggle navigation menu"
+                className="text-slate-400 hover:text-white p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 rounded-lg"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {mobileMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
               </button>
             </div>
           </div>
@@ -71,6 +74,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
+              id="mobile-menu"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -84,12 +88,13 @@ export default function Layout({ children }: { children: ReactNode }) {
                       key={item.path}
                       to={item.path}
                       onClick={() => setMobileMenuOpen(false)}
+                      aria-current={isActive ? 'page' : undefined}
                       className={cn(
-                        "block px-3 py-3 rounded-lg text-base font-medium flex items-center gap-3 transition-colors",
+                        "block px-3 py-3 rounded-lg text-base font-medium flex items-center gap-3 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500",
                         isActive ? "bg-white/10 text-white" : "text-slate-400 hover:bg-white/5 hover:text-white"
                       )}
                     >
-                      <item.icon className="w-5 h-5" />
+                      <item.icon className="w-5 h-5" aria-hidden="true" />
                       {item.name}
                     </Link>
                   );

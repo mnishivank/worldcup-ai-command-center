@@ -15,20 +15,24 @@ export default function NavigationCenter() {
           </h1>
           <p className="text-slate-400 text-sm">Real-time stadium routing and congestion awareness</p>
         </div>
-        <div className="flex bg-slate-800/50 p-1 rounded-lg border border-white/5">
+        <div className="flex bg-slate-800/50 p-1 rounded-lg border border-white/5" role="tablist" aria-label="Navigation modes">
           <button
+            role="tab"
+            aria-selected={activeTab === 'map'}
             onClick={() => setActiveTab('map')}
             className={cn(
-              "px-4 py-1.5 rounded-md text-sm font-medium transition-colors",
+              "px-4 py-1.5 rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
               activeTab === 'map' ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"
             )}
           >
             Interactive Map
           </button>
           <button
+            role="tab"
+            aria-selected={activeTab === 'routes'}
             onClick={() => setActiveTab('routes')}
             className={cn(
-              "px-4 py-1.5 rounded-md text-sm font-medium transition-colors",
+              "px-4 py-1.5 rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
               activeTab === 'routes' ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"
             )}
           >
@@ -50,8 +54,8 @@ export default function NavigationCenter() {
             
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-slate-400 mb-1 block">Current Location</label>
-                <select className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500/50">
+                <label htmlFor="start-location" className="text-xs text-slate-400 mb-1 block">Current Location</label>
+                <select id="start-location" className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 transition-all">
                   <option>North Entrance (Gate A)</option>
                   <option>South Plaza</option>
                   <option>Parking Lot C</option>
@@ -59,8 +63,8 @@ export default function NavigationCenter() {
               </div>
               
               <div>
-                <label className="text-xs text-slate-400 mb-1 block">Destination</label>
-                <select className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500/50">
+                <label htmlFor="end-location" className="text-xs text-slate-400 mb-1 block">Destination</label>
+                <select id="end-location" className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 transition-all">
                   <option>Section 120, Row G</option>
                   <option>VIP Lounge</option>
                   <option>Merchandise Store East</option>
@@ -68,13 +72,13 @@ export default function NavigationCenter() {
               </div>
 
               <div className="flex items-center gap-2 pt-2">
-                <input type="checkbox" id="accessible" className="rounded border-white/20 bg-black/40 text-emerald-500 focus:ring-emerald-500/20" />
-                <label htmlFor="accessible" className="text-sm text-slate-300 flex items-center gap-1.5">
-                  <Accessibility className="w-4 h-4" /> Require Accessible Route
+                <input type="checkbox" id="accessible" className="rounded border-white/20 bg-black/40 text-emerald-500 focus:ring-2 focus:ring-emerald-500/20" />
+                <label htmlFor="accessible" className="text-sm text-slate-300 flex items-center gap-1.5 cursor-pointer">
+                  <Accessibility className="w-4 h-4" aria-hidden="true" /> Require Accessible Route
                 </label>
               </div>
 
-              <button className="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors">
+              <button className="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900">
                 Generate Route
               </button>
             </div>
