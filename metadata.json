@@ -1,0 +1,6 @@
+{
+  "name": "WorldCup AI Command",
+  "description": "FIFA World Cup 2026 AI Command Center for stadium operations, smart navigation, and crowd intelligence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
