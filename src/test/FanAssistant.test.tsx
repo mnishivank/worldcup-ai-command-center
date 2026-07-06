@@ -27,7 +27,8 @@ describe('FanAssistant', () => {
     // Default mock implementation (authenticated)
     (AuthContextModule.useAuth as any).mockReturnValue({
       token: 'mock-token',
-      isLoading: false
+      isLoading: false,
+      login: vi.fn()
     });
 
     global.fetch = vi.fn(() =>
@@ -69,7 +70,8 @@ describe('FanAssistant', () => {
   it('blocks sending if unauthorized', async () => {
     (AuthContextModule.useAuth as any).mockReturnValue({
       token: null,
-      isLoading: false
+      isLoading: false,
+      login: vi.fn()
     });
 
     render(<FanAssistant />);

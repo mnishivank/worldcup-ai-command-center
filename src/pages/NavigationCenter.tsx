@@ -147,22 +147,38 @@ export default function NavigationCenter() {
 
         {/* Main Map Area */}
         <div className={cn("lg:col-span-3 glass-panel rounded-2xl border border-white/10 overflow-hidden relative min-h-[400px]", activeTab === 'map' ? "block" : "hidden lg:block")}>
-          <APIProvider apiKey={(import.meta as any).env.VITE_GOOGLE_MAPS_API_KEY || "dummy_key_for_demo"}>
-            <Map
-              defaultCenter={{lat: 40.8296, lng: -74.0816}} // MetLife Stadium approx
-              defaultZoom={15}
-              gestureHandling={'greedy'}
-              disableDefaultUI={true}
-              mapId="DEMO_MAP_ID"
-            >
-              <AdvancedMarker position={{lat: 40.8300, lng: -74.0810}} onClick={() => handleMarkerClick('gate-a', 'North Entrance (Gate A)')}>
-                <Pin background={activeMarker === 'gate-a' ? '#34d399' : '#0f172a'} borderColor="#10b981" glyphColor="#fff" />
-              </AdvancedMarker>
-              <AdvancedMarker position={{lat: 40.8290, lng: -74.0820}} onClick={() => handleMarkerClick('sec-120', 'Section 120, Row G')}>
-                <Pin background={activeMarker === 'sec-120' ? '#34d399' : '#0f172a'} borderColor="#10b981" glyphColor="#fff" />
-              </AdvancedMarker>
-            </Map>
-          </APIProvider>
+          {(import.meta as any).env.VITE_GOOGLE_MAPS_API_KEY ? (
+            <APIProvider apiKey={(import.meta as any).env.VITE_GOOGLE_MAPS_API_KEY}>
+              <Map
+                defaultCenter={{lat: 40.8296, lng: -74.0816}} // MetLife Stadium approx
+                defaultZoom={15}
+                gestureHandling={'greedy'}
+                disableDefaultUI={true}
+                mapId="DEMO_MAP_ID"
+              >
+                <AdvancedMarker position={{lat: 40.8300, lng: -74.0810}} onClick={() => handleMarkerClick('gate-a', 'North Entrance (Gate A)')}>
+                  <Pin background={activeMarker === 'gate-a' ? '#34d399' : '#0f172a'} borderColor="#10b981" glyphColor="#fff" />
+                </AdvancedMarker>
+                <AdvancedMarker position={{lat: 40.8290, lng: -74.0820}} onClick={() => handleMarkerClick('sec-120', 'Section 120, Row G')}>
+                  <Pin background={activeMarker === 'sec-120' ? '#34d399' : '#0f172a'} borderColor="#10b981" glyphColor="#fff" />
+                </AdvancedMarker>
+              </Map>
+            </APIProvider>
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/50 p-6 text-center">
+              <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-6 shadow-lg border border-white/5">
+                <MapIcon className="w-10 h-10 text-emerald-500" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Interactive Map Unavailable</h3>
+              <p className="text-slate-400 text-sm max-w-md mb-6 leading-relaxed">
+                To view the interactive stadium map and navigation routes, please configure your Google Maps Platform credentials.
+              </p>
+              <div className="bg-black/40 rounded-lg p-4 border border-white/10 w-full max-w-md text-left">
+                <p className="text-xs text-slate-500 mb-2 font-mono uppercase tracking-wider">Required Environment Variable</p>
+                <code className="text-emerald-400 text-sm font-mono block break-all">VITE_GOOGLE_MAPS_API_KEY=your_api_key_here</code>
+              </div>
+            </div>
+          )}
 
           <AnimatePresence>
             {isGenerating && (

@@ -12,7 +12,7 @@ interface Message {
 }
 
 export default function FanAssistant() {
-  const { token, isLoading: authLoading } = useAuth();
+  const { token, isLoading: authLoading, login } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -37,7 +37,11 @@ export default function FanAssistant() {
     if (!input.trim() || isLoading || authLoading) return;
 
     if (!token) {
-      toast.error('Authentication required to use the chat.');
+      toast.error('Authentication required. Attempting to reconnect...');
+      await login();
+      // If we still don't have a token, we might have to wait for the next render.
+      // But we can check if it succeeded by firing another auth request or assuming if it's still null we stop.
+      // Actually, since login updates context, token won't be available in this closure immediately.
       return;
     }
 
@@ -187,13 +191,26 @@ export default function FanAssistant() {
 
         {/* Input Area */}
         <div className="p-4 bg-slate-900/80 border-t border-white/10 backdrop-blur-md">
+          {!token && !authLoading && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-sm gap-2">
+              <span className="text-red-400">Connection to chat server lost.</span>
+              <button 
+                onClick={() => login()}
+                className="bg-red-500/20 hover:bg-red-500/30 text-red-300 px-3 py-1.5 rounded-md font-medium transition-colors w-full sm:w-auto"
+                type="button"
+              >
+                Reconnect
+              </button>
+            </div>
+          )}
           {messages.length === 1 && (
             <div className="flex flex-wrap gap-2 mb-4" aria-label="Suggested questions">
               {SUGGESTIONS.map((suggestion, i) => (
                 <button
                   key={i}
                   onClick={() => setInput(suggestion)}
-                  className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1.5 text-slate-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                  disabled={!token || isLoading || authLoading}
+                  className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1.5 text-slate-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {suggestion}
                 </button>
@@ -207,17 +224,17 @@ export default function FanAssistant() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about schedules, facilities, or directions..."
-              className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus-visible:ring-2 focus-visible:ring-blue-500/50 transition-all"
-              disabled={isLoading}
-              aria-disabled={isLoading}
+              placeholder={authLoading ? "Connecting..." : "Ask about schedules, facilities, or directions..."}
+              className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus-visible:ring-2 focus-visible:ring-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading || !token || authLoading}
+              aria-disabled={isLoading || !token || authLoading}
             />
             <button
               type="submit"
-              disabled={!input.trim() || isLoading}
-              aria-disabled={!input.trim() || isLoading}
+              disabled={!input.trim() || isLoading || !token || authLoading}
+              aria-disabled={!input.trim() || isLoading || !token || authLoading}
               aria-label="Send message"
-              className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 text-white rounded-xl px-4 py-3 flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 disabled:cursor-not-allowed text-white rounded-xl px-4 py-3 flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <Send className="w-5 h-5" aria-hidden="true" />
             </button>

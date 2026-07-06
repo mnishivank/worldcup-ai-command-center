@@ -10,17 +10,31 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function CrowdDashboard() {
   const [data, setData] = useState<any[]>([]);
+  const { token, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
+    if (!token || authLoading) return;
+    
     // Fetch mock data from our Express server
-    fetch('/api/analytics/crowd')
+    fetch('/api/analytics/crowd', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
       .then(res => res.json())
-      .then(d => setData(d.data))
+      .then(d => {
+        if (d.data) {
+          setData(d.data);
+        } else {
+          console.error("Failed to load data:", d);
+        }
+      })
       .catch(console.error);
-  }, []);
+  }, [token, authLoading]);
 
   return (
     <div className="flex-1 flex flex-col p-4 md:p-6 overflow-y-auto">
